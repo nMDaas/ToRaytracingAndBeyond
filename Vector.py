@@ -8,6 +8,15 @@ class Vector:
     def __getitem__(self, i):
         return self.e[i]
 
+    def x(self):
+        return self.e[0]
+    
+    def y(self):
+        return self.e[1]
+    
+    def z(self):
+        return self.e[2]
+
     def __setitem__(self, i, value):
         self.e[i] = value
     
