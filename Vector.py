@@ -25,28 +25,29 @@ class Vector:
         return Vector(-self.e[0], -self.e[1], -self.e[2])
     
     # Overriding addition 
-    def __iadd__(self, v):
-        self.e[0] += v.e[0]
-        self.e[1] += v.e[1]
-        self.e[2] += v.e[2]
-        return self
+    def __add__(self, v):
+        return Vector(self.e[0] + v.e[0], self.e[1] + v.e[1], self.e[2] + v.e[2])
     
-    # Overriding multiplication
-    def __imul__(self, t: float):
-        self.e[0] *= t
-        self.e[1] *= t
-        self.e[2] *= t
-        return self  
+    # Overriding subtraction
+    def __sub__(self, v):
+        return Vector(self.e[0] - v.e[0], self.e[1] - v.e[1], self.e[2] - v.e[2])
 
+    # Overriding multiplication
+    def __mul__(self, t: float):
+        return Vector(self.e[0] * t, self.e[1] * t, self.e[2] * t)
+    
+    def __rmul__(self, scalar: float):
+        return self.__mul__(scalar)
+    
     # Overriding division
-    def __itruediv__(self, t: float):
-        return self.__imul__(1 / t) 
+    def __truediv__(self, t: float):
+        return Vector(self.e[0] / t, self.e[1] / t, self.e[2] / t) 
     
     def length_squared(self):
         return (self.e[0] ** 2) + (self.e[1] ** 2) + (self.e[2] ** 2)
     
     def length(self):
-        return math.sqrt(length_squared(self))
+        return math.sqrt(self.length_squared())
 
     # Overriding print
     def __repr__(self):
