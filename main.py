@@ -1,26 +1,17 @@
 from Vector import Vector,dot,unit_vector
 from Color import write_color
 from Ray import Ray
+from Hittable import Hittable, HitRecord
+from HittableList import HittableList
+from Sphere import Sphere
 import math
 
-def hit_sphere(center: Vector, radius: float, r: Ray):
-    oc = center - r.origin()
-    a = r.direction().length_squared()
-    h = dot(r.direction(), oc)
-    c = oc.length_squared() - radius*radius
-    discriminant = h*h - a*c
-    
-    if (discriminant < 0):
-        return -1.0
-    else:
-        return (h - math.sqrt(discriminant)) / a
+def ray_color(r: Ray, world: Hittable):
+    rec = HitRecord()
+    if (world.hit(r, 0, float('inf'), rec)):
+        return 0.5 * (rec.normal + Vector(1,1,1))
 
-def ray_color(r: Ray):
-    t = hit_sphere(Vector(0,0,-1), 0.5, r)
-    if (t > 0.0):
-        N = unit_vector(r.at(t) - Vector(0,0,-1))
-        return 0.5*Vector(N.x()+1, N.y()+1, N.z()+1)
-    
+    # If nothing was hit
     unit_direction = unit_vector(r.direction())
     a = 0.5*(unit_direction.y() + 1.0)
     return (1.0-a)*Vector(1.0, 1.0, 1.0) + a*Vector(0.5, 0.7, 1.0)
@@ -33,6 +24,11 @@ image_width = 255
 # Calculate the image height, and ensure that it's at least 1.
 image_height = int(image_width / aspect_ratio)
 image_height = 1 if image_height < 1 else image_height
+
+# World
+world = HittableList()
+world.add(Sphere(Vector(0,0,-1), 0.5))
+world.add(Sphere(Vector(0,-100.5,-1), 100))
 
 # Camera 
 
@@ -69,7 +65,7 @@ for i in range(0, image_height):
         ray_direction = pixel_center - camera_center
         r = Ray(camera_center, ray_direction)
 
-        pixel_color = ray_color(r)
+        pixel_color = ray_color(r, world)
 
         write_color(pixel_color)
 
