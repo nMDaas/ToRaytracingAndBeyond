@@ -5,15 +5,15 @@ import math
 
 def hit_sphere(center: Vector, radius: float, r: Ray):
     oc = center - r.origin()
-    a = dot(r.direction(), r.direction())
-    b = -2.0 * dot(r.direction(), oc)
-    c = dot(oc, oc) - radius*radius
-    discriminant = b*b - 4*a*c
+    a = r.direction().length_squared()
+    h = dot(r.direction(), oc)
+    c = oc.length_squared() - radius*radius
+    discriminant = h*h - a*c
     
     if (discriminant < 0):
         return -1.0
     else:
-        return (-b - math.sqrt(discriminant) ) / (2.0*a)
+        return (h - math.sqrt(discriminant)) / a
 
 def ray_color(r: Ray):
     t = hit_sphere(Vector(0,0,-1), 0.5, r)
