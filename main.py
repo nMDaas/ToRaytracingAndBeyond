@@ -1,6 +1,7 @@
 from Vector import Vector,dot,unit_vector
 from Color import write_color
 from Ray import Ray
+import math
 
 def hit_sphere(center: Vector, radius: float, r: Ray):
     oc = center - r.origin()
@@ -8,11 +9,17 @@ def hit_sphere(center: Vector, radius: float, r: Ray):
     b = -2.0 * dot(r.direction(), oc)
     c = dot(oc, oc) - radius*radius
     discriminant = b*b - 4*a*c
-    return (discriminant >= 0)
+    
+    if (discriminant < 0):
+        return -1.0
+    else:
+        return (-b - math.sqrt(discriminant) ) / (2.0*a)
 
 def ray_color(r: Ray):
-    if (hit_sphere(Vector(0,0,-1), 0.5, r)):
-        return Vector(1.0, 0.0, 0.0)
+    t = hit_sphere(Vector(0,0,-1), 0.5, r)
+    if (t > 0.0):
+        N = unit_vector(r.at(t) - Vector(0,0,-1))
+        return 0.5*Vector(N.x()+1, N.y()+1, N.z()+1)
     
     unit_direction = unit_vector(r.direction())
     a = 0.5*(unit_direction.y() + 1.0)
