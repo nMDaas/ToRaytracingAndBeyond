@@ -1,6 +1,7 @@
 from typing import List
 from Hittable import Hittable, HitRecord
 from Ray import Ray
+from Interval import Interval
 
 class HittableList(Hittable):
     def __init__(self, object: Hittable = None):
@@ -16,14 +17,14 @@ class HittableList(Hittable):
         """Adds a hittable object to the list."""
         self.objects.append(object)
 
-    def hit(self, r: Ray, ray_tmin: float, ray_tmax: float, rec: HitRecord) -> bool:
+    def hit(self, r: Ray, ray_t: Interval, rec: HitRecord) -> bool:
         """Checks if the ray hits any object in the list and updates the closest hit record."""
         temp_rec = HitRecord()
         hit_anything = False
-        closest_so_far = ray_tmax
+        closest_so_far = ray_t.max
 
         for obj in self.objects:
-            if obj.hit(r, ray_tmin, closest_so_far, temp_rec):
+            if obj.hit(r, Interval(ray_t.min, closest_so_far), temp_rec):
                 hit_anything = True
                 closest_so_far = temp_rec.t
                 rec.t = temp_rec.t

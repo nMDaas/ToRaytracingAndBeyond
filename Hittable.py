@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from Vector import Vector, dot
 from Ray import Ray
+from Interval import Interval
 
 @dataclass
 class HitRecord:
@@ -25,5 +26,5 @@ class HitRecord:
 
 class Hittable(ABC):
     @abstractmethod
-    def hit(self, r: Ray, ray_tmin: float, ray_tmax: float, rec: HitRecord) -> bool:
+    def hit(self, r: Ray, ray_t: Interval, rec: HitRecord) -> bool:
         pass

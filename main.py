@@ -4,11 +4,11 @@ from Ray import Ray
 from Hittable import Hittable, HitRecord
 from HittableList import HittableList
 from Sphere import Sphere
-import math
+from Interval import Interval
 
 def ray_color(r: Ray, world: Hittable):
     rec = HitRecord()
-    if (world.hit(r, 0, float('inf'), rec)):
+    if (world.hit(r, Interval(0, float('inf')), rec)):
         return 0.5 * (rec.normal + Vector(1,1,1))
 
     # If nothing was hit

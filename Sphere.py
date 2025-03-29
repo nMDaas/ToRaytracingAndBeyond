@@ -2,13 +2,14 @@ import math
 from Hittable import Hittable, HitRecord
 from Vector import Vector, dot
 from Ray import Ray
+from Interval import Interval
 
 class Sphere(Hittable):
     def __init__(self, center: Vector, radius: float):
         self.center = center
         self.radius = max(0, radius)  # Ensure radius >= 0
 
-    def hit(self, r: Ray, ray_tmin: float, ray_tmax: float, rec: HitRecord) -> bool:
+    def hit(self, r: Ray, ray_t: Interval, rec: HitRecord) -> bool:
         oc = self.center - r.origin()
         a = r.direction().length_squared()
         h = dot(r.direction(), oc)
@@ -22,9 +23,9 @@ class Sphere(Hittable):
 
         # Find the nearest root within the acceptable range
         root = (h - sqrtd) / a
-        if root <= ray_tmin or ray_tmax <= root:
+        if (not ray_t.surrounds(root)):
             root = (h + sqrtd) / a
-            if root <= ray_tmin or ray_tmax <= root:
+            if (not ray_t.surrounds(root)):
                 return False  # No valid intersection
 
         rec.t = root
