@@ -14,6 +14,11 @@ class Interval:
 
     def surrounds(self, x: float):
         return (self.min < x) and (x < self.max)
+    
+    def clamp(self, x: float):
+        if (x < self.min): return self.min
+        if (x > self.max): return self.max
+        return x
 
 # Variables that belong to all instances of Interval
 Interval.empty = Interval(float('inf'), -float('inf'))  # Empty interval

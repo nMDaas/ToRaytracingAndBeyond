@@ -3,15 +3,18 @@ from Vector import Vector, unit_vector
 from Interval import Interval
 from Ray import Ray
 from Color import write_color
+from Utility import random_double
 
 class Camera:
 
     aspect_ratio: float
     image_width: float
+    samples_per_pixel: int # Count of random samples for each pixel for antialiasing
 
-    def __init__(self, aspect_ratio=(16.0/9.0), image_width=255):
+    def __init__(self, aspect_ratio=(16.0/9.0), image_width=255, samples_per_pixel=10):
         self.aspect_ratio = aspect_ratio
         self.image_width = image_width
+        self.samples_per_pixel = samples_per_pixel
 
     def render(self, world: Hittable):
         self.initialize()
@@ -22,13 +25,14 @@ class Camera:
         for i in range(0, self.image_height):
             print("\rScanlines remaining: " + str(self.image_height - i))
             for j in range(0, self.image_width):
-                pixel_center = self.pixel00_loc + (j * self.pixel_delta_u) + (i * self.pixel_delta_v)
-                ray_direction = pixel_center - self.camera_center
-                r = Ray(self.camera_center, ray_direction)
 
-                pixel_color = self.ray_color(r, world)
+                pixel_color = Vector(0,0,0)
 
-                write_color(pixel_color)
+                for sample in range(self.samples_per_pixel):
+                    r = self.get_ray(j,i)
+                    pixel_color += self.ray_color(r, world)
+
+                write_color(self.pixel_samples_scale * pixel_color)
 
         print("\rDone")
 
@@ -37,11 +41,12 @@ class Camera:
         self.image_height = int(self.image_width / self.aspect_ratio)
         self.image_height = 1 if self.image_height < 1 else self.image_height
 
+        self.pixel_samples_scale = 1.0 / self.samples_per_pixel
 
         focal_length = 1.0
         viewport_height = 2.0
         viewport_width = viewport_height * ((self.image_width)/self.image_height)
-        self.camera_center = Vector(0, 0, 0)
+        self.center = Vector(0, 0, 0)
 
         # Calculate the vectors across the horizontal and down the vertical viewport edges.
         viewport_u = Vector(viewport_width, 0, 0)
@@ -56,10 +61,24 @@ class Camera:
         self.pixel_delta_v = viewport_v / float(self.image_height)
 
         # Calculate the location of the upper left pixel.
-        viewport_upper_left = self.camera_center - Vector(0, 0, focal_length) - viewport_u/2 - viewport_v/2
+        viewport_upper_left = self.center - Vector(0, 0, focal_length) - viewport_u/2 - viewport_v/2
         self.pixel00_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v)
 
+    def get_ray(self, i: int, j:int):
+        # Construct a camera ray originating from the origin and directed at randomly sampled
+        # point around the pixel location i, j.
 
+        offset = self.sample_square()
+        pixel_sample = self.pixel00_loc + ((i + offset.x()) * self.pixel_delta_u) + ((j + offset.y()) * self.pixel_delta_v)
+
+        ray_origin = self.center
+        ray_direction = pixel_sample - ray_origin
+
+        return Ray(ray_origin, ray_direction)
+
+    def sample_square(self):
+        # Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
+        return Vector(random_double() - 0.5, random_double() - 0.5, 0)
 
     def ray_color(self, r: Ray, world: Hittable):
         rec = HitRecord()

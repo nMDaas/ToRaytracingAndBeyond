@@ -13,6 +13,7 @@ world.add(Sphere(Vector(0,-100.5,-1), 100))
 
 aspect_ratio = 16.0 / 9.0
 image_width  = 400
-cam = Camera(aspect_ratio, image_width)
+samples_per_pixel = 100
+cam = Camera(aspect_ratio, image_width, samples_per_pixel)
 
 cam.render(world)
